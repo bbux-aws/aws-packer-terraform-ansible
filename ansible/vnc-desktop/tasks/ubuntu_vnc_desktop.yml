@@ -1,0 +1,19 @@
+---
+- name: Update repositories
+  become: yes
+  command: apt-get update
+
+- name: Install Desktop Packages
+  become: yes
+  apt:
+    pkg:
+      - git
+      - curl
+      - ubuntu-desktop
+      - gnome-panel
+      - gnome-settings-daemon
+      - metacity
+      - nautilus
+      - gnome-terminal
+      - xfce4
+      - vnc4server

@@ -1,0 +1,4 @@
+---
+# tasks file for ubuntu-desktop
+- include: ubuntu_vnc_desktop.yml
+  when: os_type == 'ubuntu'

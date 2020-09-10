@@ -1,0 +1,22 @@
+---
+- name: Install Desktop Pre-Requisites
+  hosts: 'all'
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Install Desktop Packages
+      become: yes
+      ignore_errors: true
+      apt:
+        update_cache: yes
+        pkg:
+          - git
+          - curl
+          - ubuntu-desktop
+          - gnome-panel
+          - gnome-settings-daemon
+          - metacity
+          - nautilus
+          - gnome-terminal
+          - xfce4
+          - vnc4server
