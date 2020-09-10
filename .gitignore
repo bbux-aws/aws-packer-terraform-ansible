@@ -1,6 +1,5 @@
 .terraform
 *.tfstate*
-config
 config/*.json
 .idea
 build_artifact.txt

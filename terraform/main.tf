@@ -1,27 +1,89 @@
-variable "ssh_key_name" {
-  description = "The name of the key pair"
+//connections.tf
+provider "aws" {
+  region = var.region
 }
 
-variable "ingress_cidr_blocks" {
-  default = ["0.0.0.0/0"]
-  description = "The allowed ingress locations"
+//network.tf
+resource "aws_vpc" "test-env" {
+  cidr_block = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support = true
+  tags = {
+    Name = "test-env"
+  }
 }
 
-variable "instance_ami" {
-  description = "The ami to use for the instance"
+//subnets.tf
+resource "aws_subnet" "subnet-uno" {
+  cidr_block = cidrsubnet(aws_vpc.test-env.cidr_block, 3, 1)
+  vpc_id = aws_vpc.test-env.id
+  availability_zone = "us-east-1a"
 }
 
-variable "instance_type" {
-  default = "t2.micro"
-  description = "The type of the instance"
+//gateways.tf
+resource "aws_internet_gateway" "test-env-gw" {
+  vpc_id = aws_vpc.test-env.id
+  tags = {
+    Name = "test-env-gw"
+  }
 }
 
-variable "region" {
-  default = "us-east-1"
-  description = "The region to run the instance in"
+resource "aws_route_table" "route-table-test-env" {
+  vpc_id = aws_vpc.test-env.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.test-env-gw.id
+  }
+  tags = {
+    Name = "test-env-route-table"
+  }
+}
+resource "aws_route_table_association" "subnet-association" {
+  subnet_id = aws_subnet.subnet-uno.id
+  route_table_id = aws_route_table.route-table-test-env.id
 }
 
-variable "root_instance_volume_size" {
-  default = "20"
-  description = "The instance root volume size"
+//security.tf
+resource "aws_security_group" "ingress-all-test" {
+  name = "allow-all-sg"
+  vpc_id = aws_vpc.test-env.id
+  ingress {
+    cidr_blocks = var.ingress_cidr_blocks
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+  }
+  // Terraform removes the default rule
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+//servers.tf
+resource "aws_instance" "instance" {
+  ami = var.instance_ami
+  instance_type = "t2.micro"
+  key_name = var.ssh_key_name
+  security_groups = [aws_security_group.ingress-all-test.id]
+  associate_public_ip_address = true
+  subnet_id = aws_subnet.subnet-uno.id
+  tags = {
+    Name = var.instance_ami
+  }
+}
+
+// ansible inventory
+data  "template_file" "inventory" {
+  template = "../ansible/templates/hosts.ini"
+  vars = {
+    instance_ip = aws_instance.instance.public_ip
+  }
+}
+
+resource "local_file" "inventory_file" {
+  content  = data.template_file.inventory.rendered
+  filename = "../ansible/inventories/hosts.ini"
 }
