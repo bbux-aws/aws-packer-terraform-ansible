@@ -1,11 +1,9 @@
 ---
-- name: Update repositories
-  become: yes
-  command: apt-get update
-
+# may already be installed, but just in case
 - name: Install Desktop Packages
   become: yes
   apt:
+    update_cache: yes
     pkg:
       - git
       - curl
@@ -17,3 +15,18 @@
       - gnome-terminal
       - xfce4
       - vnc4server
+
+- name: Check if VNC password is already set
+  stat:
+    path: /home/{{ vnc_user }}/.vnc/passwd
+  register: vnc_passwd_file
+
+- name: Set default VNC password
+  shell: |
+    yes {{ vnc_password }} | vncpasswd
+  when: not vnc_passwd_file.stat.exists
+
+- name: Copy VNC Config
+  file:
+    src: ../files/xstartup
+    dest: /home/{{ vnc_user }}/.vnc/xstartup

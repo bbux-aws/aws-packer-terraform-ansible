@@ -1,4 +1,7 @@
 ---
 # tasks file for ubuntu-desktop
+- fail: msg="The password is empty or too short, minimum size is 6"
+  when: vnc_password|length < 6
+
 - include: ubuntu_vnc_desktop.yml
   when: os_type == 'ubuntu'

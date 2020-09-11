@@ -8,7 +8,7 @@ This project captures a simplified AWS infrastructure deployment workflow:
 
 ## Pre-Requisites
 This assumes that the AWS cli tool has been configured and that the AWS credentials to be used exist in ~/.aws/credentials
-The packer and terraform binaries should also be installed and available on the PATH.
+The packer and terraform binaries should also be installed and available on the PATH. Ansible should also be installed.
 
 ## Packer
 Packer is used to create a base AMI with the pre-requisite software installed on it.  Installing these packages can
@@ -66,4 +66,15 @@ terraform init
 terrarform plan -var-file=../config/vars.json
 # if the plan works and looks good
 terraform apply -var-file=../config/vars.json
+```
+
+
+## Ansible
+We use ansible to configure and install the necessary software components for our ubuntu Desktop
+
+The inventory file is populated by terraform after the install.  To run all of the ansible playbooks:
+
+```shell script
+cd ansible
+ansible-playbook -i inventories/hosts.ini -u ubuntu main.yml
 ```

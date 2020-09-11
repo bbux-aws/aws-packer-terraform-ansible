@@ -1,4 +1,8 @@
 ---
 - hosts: desktop
+  vars_prompt:
+    - name: vnc_password
+      prompt: "Password to use for vnc?"
+
   roles:
     - role: vnc-desktop
