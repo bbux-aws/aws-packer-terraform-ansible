@@ -67,7 +67,7 @@ resource "aws_instance" "instance" {
   ami = var.instance_ami
   instance_type = "t2.micro"
   key_name = var.ssh_key_name
-  security_groups = [aws_security_group.ingress-all-test.id]
+  vpc_security_group_ids = [aws_security_group.ingress-all-test.id]
   associate_public_ip_address = true
   subnet_id = aws_subnet.subnet-uno.id
   tags = {
@@ -77,7 +77,7 @@ resource "aws_instance" "instance" {
 
 // ansible inventory
 data  "template_file" "inventory" {
-  template = "../ansible/templates/hosts.ini"
+  template = file("${path.module}/../ansible/templates/hosts.ini")
   vars = {
     instance_ip = aws_instance.instance.public_ip
   }
