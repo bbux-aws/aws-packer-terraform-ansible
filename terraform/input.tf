@@ -21,6 +21,11 @@ variable "region" {
   description = "The region to run the instance in"
 }
 
+variable "availability_zone" {
+  default = "us-east-1a"
+  description = "The availability zone to run the instance in"
+}
+
 variable "root_instance_volume_size" {
   default = "20"
   description = "The instance root volume size"

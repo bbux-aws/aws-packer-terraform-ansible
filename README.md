@@ -39,12 +39,32 @@ We use terraform to set up the infrastructure and deploy the EC2 instance.  The 
 VPC and the necessary components needed to connect to a single EC2 instance. There are a few configuration parameters
 tha need to be added to facilitate the deployment.  These should go in config/vars.json: 
 
+### SSH Key Pair
+
+To ssh into the EC2 instance we need to attach a key pair to it.  If there is already one that exists
+in the EC2 management console, specify it in the vars.json file. If not you can generate one with:
+
+```bash
+REGION=$(grep region ~/.aws/config | awk '{print $3}')
+aws ec2 create-key-pair --key-name fmlast-dev-${REGION} \
+  --query 'KeyMaterial' --output text > ~/certs/fmlast-dev-${REGION}.pem
+
+# needs to be more restricted
+chmod 600 ~/certs/fmlast-dev-${REGION}.pem
+
+# to remove the key pair when cleaning up
+# aws ec2 delete-key-pair --key-name fmlast-dev-${REGION} 
+ 
+# prints out info about all of the configured keys for the region
+aws ec2 describe-key-pairs
+```
+
 ### Example Config
 
 ```json
 {
   "region": "us-east-1",
-  "ssh_key_name": "fmlast-dev",
+  "ssh_key_name": "fmlast-dev-us-east-1",
   "ingress_cidr_blocks": ["NN.NN.NN.NN/32", "NN.NN.NN.MM/32"],
   "instance_ami": "ami-xx00xx00xx00xx00"
 }
