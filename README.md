@@ -72,9 +72,27 @@ terraform apply -var-file=../config/vars.json
 ## Ansible
 We use ansible to configure and install the necessary software components for our ubuntu Desktop
 
-The inventory file is populated by terraform after the install.  To run all of the ansible playbooks:
+The inventory file is populated by terraform after the install.  To simplify install create an
+
+ansible.cfg file with the following contents:
+
+```
+cd ansible
+
+cat <<EOT >> ansible.cfg
+[defaults]
+inventory = inventories/hosts.ini
+remote_user = ubuntu
+private_key_file =  <path to cert.pem>
+EOT
+
+```
+
+The pem file will need to be generated in AWS and match the name used in the var.ssh_key_name.
+
+To run all of the ansible playbooks:
 
 ```shell script
-cd ansible
-ansible-playbook -i inventories/hosts.ini -u ubuntu main.yml
+
+ansible-playbook main.yml
 ```

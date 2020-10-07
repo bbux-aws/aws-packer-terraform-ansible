@@ -27,6 +27,6 @@
   when: not vnc_passwd_file.stat.exists
 
 - name: Copy VNC Config
-  file:
+  copy:
     src: ../files/xstartup
     dest: /home/{{ vnc_user }}/.vnc/xstartup
