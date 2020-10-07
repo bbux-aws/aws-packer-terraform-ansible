@@ -30,3 +30,4 @@
   copy:
     src: ../files/xstartup
     dest: /home/{{ vnc_user }}/.vnc/xstartup
+    mode: '0744'
