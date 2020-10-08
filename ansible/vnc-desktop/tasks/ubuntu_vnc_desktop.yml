@@ -31,3 +31,7 @@
     src: ../files/xstartup
     dest: /home/{{ vnc_user }}/.vnc/xstartup
     mode: '0744'
+
+- name: Start VNC Server Command
+  debug:
+    msg: vncserver -geometry {{ vnc_geometry }}

@@ -2,3 +2,4 @@
 # defaults file for vnc-desktop
 os_type: 'ubuntu'
 vnc_user: 'ubuntu'
+vnc_geometry: '1340x750'
