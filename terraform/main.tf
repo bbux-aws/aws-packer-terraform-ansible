@@ -65,7 +65,7 @@ resource "aws_security_group" "ingress-all-test" {
 //servers.tf
 resource "aws_instance" "instance" {
   ami = var.instance_ami
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
   key_name = var.ssh_key_name
   vpc_security_group_ids = [aws_security_group.ingress-all-test.id]
   associate_public_ip_address = true
