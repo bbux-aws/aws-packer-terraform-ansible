@@ -63,7 +63,10 @@ resource "aws_security_group" "ingress-all-test" {
 }
 
 //servers.tf
+// will only use one or the other, regular or spot instance
 resource "aws_instance" "instance" {
+  count = var.use_spot_instances ? 0 : 1
+
   ami = var.instance_ami
   instance_type = var.instance_type
   key_name = var.ssh_key_name
@@ -78,11 +81,31 @@ resource "aws_instance" "instance" {
   }
 }
 
+resource "aws_spot_instance_request" "spot_instance" {
+  count = var.use_spot_instances ? 1 : 0
+  block_duration_minutes = var.block_duration_minutes
+  spot_type = "one-time"
+
+  ami = var.instance_ami
+  instance_type = var.spot_instance_type
+  key_name = var.ssh_key_name
+  vpc_security_group_ids = [aws_security_group.ingress-all-test.id]
+  associate_public_ip_address = true
+  subnet_id = aws_subnet.subnet-uno.id
+  tags = {
+    Name = var.instance_ami
+  }
+}
+
 // ansible inventory
 data  "template_file" "inventory" {
   template = file("${path.module}/../ansible/templates/hosts.ini")
   vars = {
-    instance_ip = aws_instance.instance.public_ip
+    // hack to work with conditional spot instance configuration, otherwise will result in
+    // error: Error: Missing resource instance key
+    instance_ip = (var.use_spot_instances ?
+      join("", aws_spot_instance_request.spot_instance[*].public_ip) :
+      join("", aws_instance.instance[*].public_ip))
   }
 }
 

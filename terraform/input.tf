@@ -30,3 +30,19 @@ variable "root_instance_volume_size" {
   default = "20"
   description = "The instance root volume size"
 }
+
+variable "use_spot_instances" {
+  description = "If set to true, try to use spot instances"
+  default = false
+  type = bool
+}
+
+variable "spot_instance_type" {
+  description = "Type of spot instance to use, default is t2.medium"
+  default = "t2.medium"
+}
+
+variable "block_duration_minutes" {
+  description = "How long to run the spot instance, default is 1 hour/60 minutes"
+  default = 60
+}
