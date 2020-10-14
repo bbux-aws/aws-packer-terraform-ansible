@@ -83,7 +83,11 @@ resource "aws_instance" "instance" {
 
 resource "aws_spot_instance_request" "spot_instance" {
   count = var.use_spot_instances ? 1 : 0
-  block_duration_minutes = var.block_duration_minutes
+
+  // this might not work for free tier projects, due to billing restrictions
+  // "new customers or customers without AWS billing history are not eligible to use Spot Blocks."
+  //block_duration_minutes = var.block_duration_minutes
+
   spot_type = "one-time"
 
   ami = var.instance_ami
@@ -92,6 +96,9 @@ resource "aws_spot_instance_request" "spot_instance" {
   vpc_security_group_ids = [aws_security_group.ingress-all-test.id]
   associate_public_ip_address = true
   subnet_id = aws_subnet.subnet-uno.id
+  root_block_device {
+    volume_size = var.root_instance_volume_size
+  }
   tags = {
     Name = var.instance_ami
   }

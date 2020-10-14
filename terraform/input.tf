@@ -38,11 +38,11 @@ variable "use_spot_instances" {
 }
 
 variable "spot_instance_type" {
-  description = "Type of spot instance to use, default is t2.medium"
-  default = "t2.medium"
+  description = "Type of spot instance to use, default is t2.micro."
+  default = "t2.micro"
 }
 
 variable "block_duration_minutes" {
-  description = "How long to run the spot instance, default is 1 hour/60 minutes"
+  description = "How long to run the spot instance, default is 1 hour/60 minutes."
   default = 60
 }
