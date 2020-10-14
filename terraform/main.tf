@@ -70,6 +70,9 @@ resource "aws_instance" "instance" {
   vpc_security_group_ids = [aws_security_group.ingress-all-test.id]
   associate_public_ip_address = true
   subnet_id = aws_subnet.subnet-uno.id
+  root_block_device {
+    volume_size = var.root_instance_volume_size
+  }
   tags = {
     Name = var.instance_ami
   }
